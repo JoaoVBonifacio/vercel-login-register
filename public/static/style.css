@@ -356,12 +356,22 @@ body.dark-mode .theme-toggle .fa-moon {
 /* =================================================================== */
 
 @media (max-width: 870px) {
-  /* Remove a animação de deslize lateral */
+  /* 1. CONFIGURAÇÃO GERAL DO LAYOUT MOBILE */
+  
+  /* Usa Flexbox para criar uma coluna vertical limpa */
+  .container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  
+  /* Remove as animações e posicionamentos do modo desktop */
   .container:before {
     display: none;
   }
 
-  /* Remove o posicionamento absoluto para que os itens fluam normalmente */
   .forms-container, .panels-container, .signin-signup {
     position: static;
     transform: none;
@@ -373,10 +383,6 @@ body.dark-mode .theme-toggle .fa-moon {
     padding: 2rem 0;
   }
 
-  .panels-container {
-    padding: 0;
-  }
-
   .panel {
     flex-direction: column;
     justify-content: center;
@@ -385,65 +391,67 @@ body.dark-mode .theme-toggle .fa-moon {
   }
   
   .panel .content {
-    transform: none; /* Reseta transformações anteriores */
+    transform: none;
     transition: none;
   }
 
-  .left-panel {
-    padding: 2rem 1rem;
-  }
-
-  .right-panel {
-    padding: 2rem 1rem;
-  }
-
   .image {
-    display: none; /* Esconde as imagens SVGs no mobile para economizar espaço */
+    display: none;
   }
 
-  /* LÓGICA PRINCIPAL COM FLEXBOX */
+  /* 2. LÓGICA DE EXIBIÇÃO (A PARTE CORRIGIDA) */
+
+  /* --- PAINÉIS (AS PARTES AZUIS) --- */
   
-  .container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    justify-content: center;
-    padding: 2rem 1rem;
-  }
-
-  /* Esconde o formulário que não está ativo */
-  .container form.sign-in-form {
+  /* Por padrão (modo login), esconde o painel da direita */
+  .container:not(.sign-up-mode) .right-panel {
     display: none;
   }
-  .container.sign-up-mode form.sign-in-form {
-    display: none;
-  }
-  .container.sign-up-mode form.sign-up-form {
-    display: flex; /* Garante que o formulário de registro apareça */
-  }
-
-  /* Esconde o painel que não está ativo */
-  .container .right-panel {
-    display: none;
-  }
+  
+  /* Quando em modo registro, esconde o painel da esquerda e mostra o da direita */
   .container.sign-up-mode .left-panel {
     display: none;
   }
   .container.sign-up-mode .right-panel {
-    display: flex; /* Garante que o painel de boas-vindas apareça */
+    display: flex;
+  }
+  
+  /* --- FORMULÁRIOS --- */
+  
+  /* Por padrão (modo login), mostra o formulário de login e esconde o de registro */
+  .container:not(.sign-up-mode) .sign-in-form {
+    display: flex;
+  }
+  .container:not(.sign-up-mode) .sign-up-form {
+    display: none;
+  }
+  
+  /* Quando em modo registro, esconde o formulário de login e mostra o de registro */
+  .container.sign-up-mode .sign-in-form {
+    display: none;
+  }
+  .container.sign-up-mode .sign-up-form {
+    display: flex;
   }
 
-  /* Controla a ordem dos elementos */
-  .container .left-panel { order: 1; }
-  .container .forms-container { order: 2; }
-  
-  .container.sign-up-mode .right-panel { order: 1; }
-  .container.sign-up-mode .forms-container { order: 2; }
 
+  /* 3. LÓGICA DE ORDEM DOS ELEMENTOS */
+
+  /* Define a ordem: primeiro o painel, depois o formulário */
+  .panel { order: 1; }
+  .forms-container { order: 2; }
 }
 
 @media (max-width: 570px) {
   form {
     padding: 0 1.5rem;
+  }
+  
+  .panel .content {
+    padding: 0.5rem 1rem;
+  }
+  
+  .container {
+    padding: 1.5rem;
   }
 }
