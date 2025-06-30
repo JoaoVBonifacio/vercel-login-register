@@ -43,7 +43,7 @@ db = firestore.client()
 
 
 # Suas rotas (/register, /profile) continuam exatamente as mesmas aqui...
-@app.route('/register', methods=['POST'])
+@app.route('/api/register', methods=['POST'])
 def register():
     """
     Endpoint para registrar um novo usuário.
@@ -87,7 +87,7 @@ def register():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@app.route('/profile', methods=['GET'])
+@app.route('/api/profile', methods=['GET'])
 def profile():
     # O código da sua rota de perfil vai aqui. Colei um exemplo funcional.
     try:
