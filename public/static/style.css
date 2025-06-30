@@ -348,55 +348,8 @@ body.dark-mode .theme-toggle .fa-moon {
     min-height: 800px;
     height: 100vh;
   }
-  .signin-signup {
-    width: 100%;
-    top: 95%;
-    transform: translate(-50%, -100%);
-    transition: 1s 0.8s ease-in-out;
-  }
-  .signin-signup,
-  .forms-container {
-    left: 50%;
-  }
-  .panels-container {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 2fr 1fr;
-  }
-  .panel {
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    padding: 2.5rem 8%;
-    grid-column: 1 / 2;
-  }
-  .right-panel {
-    grid-row: 3 / 4;
-  }
-  .left-panel {
-    grid-row: 1 / 2;
-  }
-  .image {
-    width: 200px;
-    transition: transform 0.9s ease-in-out;
-    transition-delay: 0.6s;
-  }
-  .panel .content {
-    padding-right: 15%;
-    transition: transform 0.9s ease-in-out;
-    transition-delay: 0.8s;
-  }
-  .panel h3 {
-    font-size: 1.2rem;
-  }
-  .panel p {
-    font-size: 0.7rem;
-    padding: 0.5rem 0;
-  }
-  .btn.transparent {
-    width: 110px;
-    height: 35px;
-    font-size: 0.7rem;
-  }
+
+  /* Remove o efeito de deslize do painel azul no mobile */
   .container:before {
     width: 1500px;
     height: 1500px;
@@ -407,26 +360,85 @@ body.dark-mode .theme-toggle .fa-moon {
     top: initial;
     transition: 2s ease-in-out;
   }
-  .container.sign-up-mode:before {
-    transform: translate(-50%, 100%);
-    bottom: 32%;
-    right: initial;
+
+  /* Remove o posicionamento absoluto e centraliza o container dos formulários */
+  .signin-signup {
+    width: 100%;
+    left: 50%;
+    top: 50%; /* Centraliza verticalmente */
+    transform: translate(-50%, -50%);
+    transition: 1s 0.8s ease-in-out;
   }
-  .container.sign-up-mode .left-panel .image,
-  .container.sign-up-mode .left-panel .content {
+  
+  /* Garante que o painel azul e o formulário fiquem em colunas separadas */
+  .panels-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto; /* Ajusta as linhas para o conteúdo */
+  }
+
+  .panel {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 2.5rem 8%;
+    grid-column: 1 / 2;
+  }
+
+  .right-panel {
+    grid-row: 3 / 4;
+  }
+
+  .left-panel {
+    grid-row: 1 / 2;
+  }
+
+  .image {
+    width: 200px;
+    transition: 0.9s 0.6s ease-in-out;
+  }
+
+  .panel .content {
+    padding-right: 15%;
+    transition: 0.9s 0.8s ease-in-out;
+  }
+
+  .panel h3 {
+    font-size: 1.2rem;
+  }
+
+  .panel p {
+    font-size: 0.7rem;
+    padding: 0.5rem 0;
+  }
+
+  .btn.transparent {
+    width: 110px;
+    height: 35px;
+    font-size: 0.7rem;
+  }
+
+  /* Lógica de troca no modo de registro para mobile */
+  .container.sign-up-mode .panel.left-panel,
+  .container.sign-up-mode .panel.right-panel .image,
+  .container.sign-up-mode .panel.right-panel .content {
     transform: translateY(-300px);
+    pointer-events: none; /* Desativa eventos no painel escondido */
   }
-  .container.sign-up-mode .right-panel .image,
-  .container.sign-up-mode .right-panel .content {
-    transform: translateY(0px);
+
+  .container.sign-up-mode .panel.right-panel {
+      pointer-events: all; /* Ativa eventos no painel visível */
   }
-  .right-panel .image,
-  .right-panel .content {
-    transform: translateY(300px);
-  }
+
   .container.sign-up-mode .signin-signup {
-    top: 5%;
-    transform: translate(-50%, 0);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Esconde o painel que não é relevante para a ação atual */
+  .container:not(.sign-up-mode) .panel.right-panel,
+  .container.sign-up-mode .panel.left-panel {
+    display: none;
   }
 }
 
@@ -434,21 +446,16 @@ body.dark-mode .theme-toggle .fa-moon {
   form {
     padding: 0 1.5rem;
   }
+
   .image {
     display: none;
   }
+  
   .panel .content {
     padding: 0.5rem 1rem;
   }
+  
   .container {
     padding: 1.5rem;
-  }
-  .container:before {
-    bottom: 72%;
-    left: 50%;
-  }
-  .container.sign-up-mode:before {
-    bottom: 28%;
-    left: 50%;
   }
 }
