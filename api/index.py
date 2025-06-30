@@ -7,7 +7,21 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app) # Habilita o CORS
+
+# --- NOVA CONFIGURAÇÃO DE CORS ---
+# Pega a URL do frontend a partir das variáveis de ambiente da Vercel
+frontend_url = os.getenv('FRONTEND_URL')
+
+# Se a variável não estiver definida (para testes locais), define um padrão.
+# No ambiente da Vercel, essa variável PRECISA estar configurada.
+if not frontend_url:
+    frontend_url = "http://127.0.0.1:5500" 
+
+# Configura o CORS para permitir requisições apenas da sua URL de frontend
+# para todas as rotas que começam com /api/
+CORS(app, resources={r"/api/*": {"origins": frontend_url}})
+# --- FIM DA NOVA CONFIGURAÇÃO ---
+
 
 # --- LÓGICA DE INICIALIZAÇÃO ADAPTADA PARA VERCEL ---
 # Verifica se o app já foi inicializado
@@ -29,7 +43,6 @@ db = firestore.client()
 
 
 # Suas rotas (/register, /profile) continuam exatamente as mesmas aqui...
-# ... (copie e cole as funções @app.route('/register') e @app.route('/profile') aqui)
 @app.route('/register', methods=['POST'])
 def register():
     """
@@ -76,5 +89,32 @@ def register():
 
 @app.route('/profile', methods=['GET'])
 def profile():
-    # ... seu código da rota de perfil
-    pass
+    # O código da sua rota de perfil vai aqui. Colei um exemplo funcional.
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({"error": "Token de autorização não encontrado"}), 401
+
+        id_token = auth_header.split(' ').pop()
+        
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+
+        user_ref = db.collection('users').document(uid)
+        user_doc = user_ref.get()
+
+        if user_doc.exists:
+            return jsonify(user_doc.to_dict()), 200
+        else:
+            new_user_data = {
+                "name": decoded_token.get("name", "Nome não fornecido"),
+                "email": decoded_token["email"],
+                "created_at": firestore.SERVER_TIMESTAMP
+            }
+            user_ref.set(new_user_data)
+            return jsonify(new_user_data), 200
+
+    except auth.InvalidIdTokenError:
+        return jsonify({"error": "Token inválido"}), 401
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
