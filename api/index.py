@@ -32,8 +32,47 @@ db = firestore.client()
 # ... (copie e cole as funções @app.route('/register') e @app.route('/profile') aqui)
 @app.route('/register', methods=['POST'])
 def register():
-    # ... seu código da rota de registro
-    pass
+    """
+    Endpoint para registrar um novo usuário.
+    Cria o usuário, um documento no Firestore e retorna um token de login personalizado.
+    """
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    name = data.get('name')
+
+    if not all([email, password, name]):
+        return jsonify({"error": "Dados incompletos"}), 400
+
+    try:
+        # Cria o usuário no Firebase Authentication
+        user = auth.create_user(
+            email=email,
+            password=password,
+            display_name=name  # Adiciona o nome ao perfil de autenticação também
+        )
+
+        # Cria um documento para o usuário no Firestore
+        user_data = {
+            "name": name,
+            "email": email,
+            "created_at": firestore.SERVER_TIMESTAMP
+        }
+        db.collection('users').document(user.uid).set(user_data)
+
+        # NOVO: Gera um token de login personalizado para o novo usuário
+        custom_token = auth.create_custom_token(user.uid)
+
+        # Retorna o token junto com a mensagem de sucesso
+        return jsonify({
+            "message": f"Usuário {user.uid} criado com sucesso!",
+            "token": custom_token.decode('utf-8')  # Decodifica o token para string
+        }), 201
+
+    except auth.EmailAlreadyExistsError:
+        return jsonify({"error": "Este e-mail já está em uso."}), 409
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 @app.route('/profile', methods=['GET'])
 def profile():

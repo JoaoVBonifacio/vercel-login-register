@@ -55,11 +55,11 @@ const googleLoginBtn = document.getElementById('google-login-btn');
 const loginErrorMsg = document.getElementById('login-error-message');
 const registerErrorMsg = document.getElementById('register-error-message');
 
-// Lógica de Registro com Email/Senha
+// Lógica de Registro com Email/Senha (ATUALIZADA)
 if (signUpForm) {
     signUpForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        registerErrorMsg.innerText = ""; // Limpa erros antigos
+        registerErrorMsg.innerText = "";
 
         const name = document.getElementById('register-name').value;
         const email = document.getElementById('register-email').value;
@@ -75,9 +75,23 @@ if (signUpForm) {
             if (data.error) {
                 registerErrorMsg.innerText = data.error;
             } else {
-                alert(data.message); // Exibe mensagem de sucesso
-                container.classList.remove("sign-up-mode"); // Volta para a tela de login
-                signUpForm.reset(); // Limpa o formulário de registro
+                // SUCESSO! O backend enviou um token.
+                const customToken = data.token;
+
+                // Usa o token personalizado para fazer o login
+                auth.signInWithCustomToken(customToken)
+                    .then((userCredential) => {
+                        // Login automático bem-sucedido! Agora pega o ID Token padrão.
+                        userCredential.user.getIdToken().then((idToken) => {
+                            sessionStorage.setItem('firebaseToken', idToken);
+                            window.location.href = 'dashboard.html'; // Redireciona para o painel
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Erro no login automático após registro:", error);
+                        // Se o login automático falhar, redireciona para a tela de login manual
+                        container.classList.remove("sign-up-mode");
+                    });
             }
         })
         .catch(error => {
