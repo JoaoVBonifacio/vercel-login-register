@@ -193,7 +193,7 @@ if (editProfileForm) {
         const newNick = document.getElementById('edit-nick').value;
         const token = sessionStorage.getItem('firebaseToken');
 
-        fetch(`${backendUrl}/api/profile`, {
+        fetch(`${backendUrl}/profile`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
