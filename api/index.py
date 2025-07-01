@@ -98,38 +98,22 @@ def profile():
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
 
-        # --- NOVA LÓGICA AQUI ---
-        
-        # 1. Busca os dados do usuário no serviço de Autenticação para pegar a foto
-        auth_user = auth.get_user(uid)
-        photo_url = auth_user.photo_url
-
-        # 2. Busca os dados do nosso banco de dados Firestore
+        # --- LÓGICA SIMPLIFICADA (VERSÃO ANTIGA E ESTÁVEL) ---
         user_doc = db.collection('users').document(uid).get()
 
         if user_doc.exists:
-            firestore_data = user_doc.to_dict()
-            
-            # 3. Combina os dados do Firestore com a URL da foto
-            response_data = {
-                "name": firestore_data.get("name"),
-                "email": firestore_data.get("email"),
-                "photo_url": photo_url # Adiciona a URL da foto à resposta
-            }
-            return jsonify(response_data), 200
+            # Apenas retorna os dados do Firestore, sem buscar a foto
+            return jsonify(user_doc.to_dict()), 200
         else:
-            # Lógica para criar perfil de usuário de primeira viagem (como no login com Google)
-            # já inclui a foto na resposta.
+            # Lógica para criar o perfil se for o primeiro login (ex: com Google)
             new_user_data = {
                 "name": decoded_token.get("name", "Nome não fornecido"),
                 "email": decoded_token["email"],
-                "created_at": firestore.SERVER_TIMESTAMP,
+                "created_at": firestore.SERVER_TIMESTAMP
             }
             db.collection('users').document(uid).set(new_user_data)
-
-            # Adiciona a foto na resposta de criação também
-            new_user_data["photo_url"] = photo_url
-            # Remove o created_at da resposta JSON para não dar erro de serialização
+            
+            # Remove o timestamp da resposta para evitar erro de JSON
             if "created_at" in new_user_data:
                 new_user_data.pop("created_at")
 
@@ -138,4 +122,6 @@ def profile():
     except auth.InvalidIdTokenError:
         return jsonify({"error": "Token inválido"}), 401
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Adiciona um print para vermos o erro nos logs da Vercel
+        print(f"Erro inesperado no endpoint /api/profile: {e}")
+        return jsonify({"error": "Ocorreu um erro interno no servidor."}), 500
