@@ -148,7 +148,7 @@ if (window.location.pathname.endsWith('dashboard.html')) {
     if (!token) {
         window.location.href = 'index.html';
     } else {
-        fetch(`${backendUrl}/api/profile`, {
+        fetch(`${backendUrl}/profile`, {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
         })
