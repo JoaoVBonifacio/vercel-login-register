@@ -1,6 +1,6 @@
 # api/index.py
 import os
-import json # Importa a biblioteca JSON
+import json
 from firebase_admin import credentials, auth, firestore
 import firebase_admin
 from flask import Flask, request, jsonify
@@ -8,47 +8,25 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-# --- NOVA CONFIGURAÇÃO DE CORS ---
-# Pega a URL do frontend a partir das variáveis de ambiente da Vercel
-frontend_url = os.getenv('FRONTEND_URL')
-
-# Se a variável não estiver definida (para testes locais), define um padrão.
-# No ambiente da Vercel, essa variável PRECISA estar configurada.
-if not frontend_url:
-    frontend_url = "http://127.0.0.1:5500" 
-
-# Configura o CORS para permitir requisições apenas da sua URL de frontend
-# para todas as rotas que começam com /api/
+# Configuração de CORS
+frontend_url = os.getenv('FRONTEND_URL', "http://127.0.0.1:5500")
 CORS(app, resources={r"/api/*": {"origins": frontend_url}})
-# --- FIM DA NOVA CONFIGURAÇÃO ---
 
-
-# --- LÓGICA DE INICIALIZAÇÃO ADAPTADA PARA VERCEL ---
-# Verifica se o app já foi inicializado
+# Inicialização do Firebase
 if not firebase_admin._apps:
-    # Pega o conteúdo da variável de ambiente
     firebase_creds_json = os.getenv('FIREBASE_SERVICE_ACCOUNT_JSON')
     if not firebase_creds_json:
         raise ValueError("A variável de ambiente FIREBASE_SERVICE_ACCOUNT_JSON não está definida.")
-    
-    # Converte a string JSON em um dicionário Python
     creds_dict = json.loads(firebase_creds_json)
-    
-    # Inicializa o SDK do Firebase
     cred = credentials.Certificate(creds_dict)
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-# ---------------------------------------------------
 
+# --- ROTAS ---
 
-# Suas rotas (/register, /profile) continuam exatamente as mesmas aqui...
 @app.route('/api/register', methods=['POST'])
 def register():
-    """
-    Endpoint para registrar um novo usuário.
-    Cria o usuário, um documento no Firestore e retorna um token de login personalizado.
-    """
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -58,28 +36,21 @@ def register():
         return jsonify({"error": "Dados incompletos"}), 400
 
     try:
-        # Cria o usuário no Firebase Authentication
         user = auth.create_user(
             email=email,
             password=password,
-            display_name=name  # Adiciona o nome ao perfil de autenticação também
+            display_name=name
         )
-
-        # Cria um documento para o usuário no Firestore
         user_data = {
             "name": name,
             "email": email,
             "created_at": firestore.SERVER_TIMESTAMP
         }
         db.collection('users').document(user.uid).set(user_data)
-
-        # NOVO: Gera um token de login personalizado para o novo usuário
         custom_token = auth.create_custom_token(user.uid)
-
-        # Retorna o token junto com a mensagem de sucesso
         return jsonify({
             "message": f"Usuário {user.uid} criado com sucesso!",
-            "token": custom_token.decode('utf-8')  # Decodifica o token para string
+            "token": custom_token.decode('utf-8')
         }), 201
 
     except auth.EmailAlreadyExistsError:
@@ -98,7 +69,7 @@ def profile():
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
 
-        # --- LÓGICA FINAL E COMPLETA ---
+        # --- LÓGICA FINAL E COMPLETA PARA BUSCAR TODOS OS DADOS ---
         
         # 1. Busca o usuário no serviço de Autenticação para pegar a URL da foto
         auth_user = auth.get_user(uid)
@@ -114,7 +85,7 @@ def profile():
             response_data = {
                 "name": firestore_data.get("name"),
                 "email": firestore_data.get("email"),
-                "photo_url": photo_url # Adiciona a foto aqui
+                "photo_url": photo_url 
             }
             return jsonify(response_data), 200
         else:
@@ -126,7 +97,7 @@ def profile():
             }
             db.collection('users').document(uid).set(new_user_data)
 
-            new_user_data["photo_url"] = photo_url # Adiciona a foto na resposta de criação também
+            new_user_data["photo_url"] = photo_url
             if "created_at" in new_user_data:
                 new_user_data.pop("created_at")
 
