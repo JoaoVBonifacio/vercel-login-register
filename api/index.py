@@ -89,29 +89,50 @@ def register():
 
 @app.route('/api/profile', methods=['GET'])
 def profile():
-    # O código da sua rota de perfil vai aqui. Colei um exemplo funcional.
     try:
         auth_header = request.headers.get('Authorization')
         if not auth_header:
             return jsonify({"error": "Token de autorização não encontrado"}), 401
-
-        id_token = auth_header.split(' ').pop()
         
+        id_token = auth_header.split(' ').pop()
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
 
-        user_ref = db.collection('users').document(uid)
-        user_doc = user_ref.get()
+        # --- NOVA LÓGICA AQUI ---
+        
+        # 1. Busca os dados do usuário no serviço de Autenticação para pegar a foto
+        auth_user = auth.get_user(uid)
+        photo_url = auth_user.photo_url
+
+        # 2. Busca os dados do nosso banco de dados Firestore
+        user_doc = db.collection('users').document(uid).get()
 
         if user_doc.exists:
-            return jsonify(user_doc.to_dict()), 200
+            firestore_data = user_doc.to_dict()
+            
+            # 3. Combina os dados do Firestore com a URL da foto
+            response_data = {
+                "name": firestore_data.get("name"),
+                "email": firestore_data.get("email"),
+                "photo_url": photo_url # Adiciona a URL da foto à resposta
+            }
+            return jsonify(response_data), 200
         else:
+            # Lógica para criar perfil de usuário de primeira viagem (como no login com Google)
+            # já inclui a foto na resposta.
             new_user_data = {
                 "name": decoded_token.get("name", "Nome não fornecido"),
                 "email": decoded_token["email"],
-                "created_at": firestore.SERVER_TIMESTAMP
+                "created_at": firestore.SERVER_TIMESTAMP,
             }
-            user_ref.set(new_user_data)
+            db.collection('users').document(uid).set(new_user_data)
+
+            # Adiciona a foto na resposta de criação também
+            new_user_data["photo_url"] = photo_url
+            # Remove o created_at da resposta JSON para não dar erro de serialização
+            if "created_at" in new_user_data:
+                new_user_data.pop("created_at")
+
             return jsonify(new_user_data), 200
 
     except auth.InvalidIdTokenError:

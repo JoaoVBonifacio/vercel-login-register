@@ -143,3 +143,66 @@ if (googleLoginBtn) {
     });
 }
 
+
+// Lógica do Dashboard e Rotas Protegidas (ATUALIZADA)
+if (window.location.pathname.endsWith('dashboard.html')) {
+    const token = sessionStorage.getItem('firebaseToken');
+    if (!token) {
+        window.location.href = 'index.html';
+    } else {
+        // Busca os dados do perfil no backend
+        fetch(`${backendUrl}/api/profile`, { // Garante que a rota é /api/profile
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                sessionStorage.removeItem('firebaseToken');
+                window.location.href = 'index.html';
+                throw new Error('Token inválido ou expirado.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // --- NOVA LÓGICA PARA EXIBIR A FOTO ---
+            const profilePicElement = document.getElementById('profile-picture');
+            const userInfoDiv = document.getElementById('user-info');
+            
+            // Define a foto de perfil
+            if (data.photo_url) {
+                // Se o usuário tem uma foto (ex: veio do Google), usa ela
+                profilePicElement.src = data.photo_url;
+            } else {
+                // Se não, usa um avatar padrão (ícone de usuário)
+                // Este é um SVG em formato de dados, não requer download de imagem
+                profilePicElement.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgLjg4Ljc3IDEuNTQgMS41IDEuNTNoMTNjLjg4IDAgMS41LS43NyAxLjUtMS41NHYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz48L3N2Zz4=';
+            }
+
+            // Define o nome e o email
+            userInfoDiv.innerHTML = `
+                <p><strong>Nome:</strong> ${data.name}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+            `;
+        })
+        .catch(error => {
+            console.error('Erro ao buscar perfil:', error);
+            const userInfoDiv = document.getElementById('user-info');
+            userInfoDiv.innerText = "Não foi possível carregar os dados do perfil.";
+        });
+    }
+
+    // Lógica de Logout (não muda)
+    const logoutButton = document.getElementById('logout-button');
+    if(logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                sessionStorage.removeItem('firebaseToken');
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Erro no logout:', error);
+            });
+        });
+    }
+}

@@ -5,8 +5,29 @@
     <title>Dashboard</title>
 </head>
 <body>
-    <h1>Bem-vindo ao seu Dashboard!</h1>
-    <div id="user-info">Carregando dados...</div>
+    <style>
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        #profile-picture {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%; /* Deixa a imagem redonda */
+            object-fit: cover; /* Garante que a imagem preencha o círculo */
+            background-color: #f0f0f0; /* Cor de fundo enquanto carrega */
+        }
+    </style>
+
+    <h1>Seu Dashboard</h1>
+
+    <div class="profile-header">
+        <img id="profile-picture" src="" alt="Foto de Perfil">
+        <div id="user-info">Carregando dados...</div>
+    </div>
+    
     <button id="logout-button">Sair</button>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
