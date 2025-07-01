@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
-            fetch(`${backendUrl}/api/register`, { // Rota corrigida
+            fetch(`${backendUrl}/register`, { // Rota corrigida
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password }),
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = 'index.html';
         } else {
             // ... (o resto da lógica do dashboard continua aqui, sem alterações)
-            fetch(`${backendUrl}/api/profile`, {
+            fetch(`${backendUrl}/profile`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             })
