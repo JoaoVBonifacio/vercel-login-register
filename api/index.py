@@ -108,3 +108,43 @@ def profile():
     except Exception as e:
         print(f"Erro inesperado no endpoint /api/profile: {e}")
         return jsonify({"error": "Ocorreu um erro interno no servidor."}), 500
+
+# ... (todo o seu código anterior, incluindo a rota /api/profile com GET, continua aqui) ...
+
+@app.route('/api/profile', methods=['PUT'])
+def update_profile():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({"error": "Token de autorização não encontrado"}), 401
+        
+        id_token = auth_header.split(' ').pop()
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+
+        data = request.get_json()
+        name = data.get('name')
+        nick = data.get('nick')
+
+        # Validação simples dos dados recebidos
+        if not name or not nick:
+            return jsonify({"error": "Nome e Nick são obrigatórios."}), 400
+        
+        # Validação do nick (somente letras minúsculas e números)
+        if not nick.isalnum() or not nick.islower():
+            return jsonify({"error": "O Nick deve conter apenas letras minúsculas e números, sem espaços."}), 400
+
+        # Prepara os dados para atualização
+        update_data = {
+            "name": name,
+            "nick": nick
+        }
+
+        # Atualiza o documento no Firestore
+        db.collection('users').document(uid).update(update_data)
+
+        return jsonify({"message": "Perfil atualizado com sucesso!", "updatedData": update_data}), 200
+
+    except Exception as e:
+        print(f"Erro ao atualizar perfil: {e}")
+        return jsonify({"error": "Ocorreu um erro interno ao atualizar o perfil."}), 500

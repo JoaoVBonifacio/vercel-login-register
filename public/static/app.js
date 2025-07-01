@@ -145,6 +145,81 @@ document.addEventListener('DOMContentLoaded', function() {
     // Lógica do Dashboard e Rotas Protegidas (VERSÃO FINAL CORRIGIDA)
 if (window.location.pathname.endsWith('dashboard.html')) {
     const token = sessionStorage.getItem('firebaseToken');
+    // --- LÓGICA DO MODAL DE EDIÇÃO DE PERFIL ---
+
+    const modal = document.getElementById('edit-profile-modal');
+    const openModalBtn = document.getElementById('edit-profile-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const editProfileForm = document.getElementById('edit-profile-form');
+    const formErrorMsg = document.getElementById('form-error-message');
+
+    // Função para abrir o modal
+if (openModalBtn) {
+    openModalBtn.addEventListener('click', () => {
+        // Preenche o formulário com os dados atuais antes de abrir
+        const currentName = document.getElementById('user-name').textContent;
+        const currentEmailHandle = document.getElementById('user-email').textContent;
+        
+        document.getElementById('edit-name').value = currentName;
+        // Pega o nick do handle (remove o @)
+        document.getElementById('edit-nick').value = currentEmailHandle.substring(1);
+
+        modal.classList.remove('hidden');
+    });
+}
+
+// Função para fechar o modal
+function closeModal() {
+    modal.classList.add('hidden');
+}
+
+if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+// Fecha o modal se clicar fora dele
+if (modal) {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+}
+
+// Lógica para salvar o formulário
+if (editProfileForm) {
+    editProfileForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        formErrorMsg.textContent = ''; // Limpa erros antigos
+
+        const newName = document.getElementById('edit-name').value;
+        const newNick = document.getElementById('edit-nick').value;
+        const token = sessionStorage.getItem('firebaseToken');
+
+        fetch(`${backendUrl}/api/profile`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ name: newName, nick: newNick })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                formErrorMsg.textContent = data.error;
+            } else {
+                // Atualiza o nome na página do dashboard dinamicamente
+                document.getElementById('user-name').textContent = data.updatedData.name;
+                document.getElementById('user-email').textContent = `@${data.updatedData.nick}`;
+                alert('Perfil atualizado com sucesso!');
+                closeModal();
+            }
+        })
+        .catch(err => {
+            console.error('Erro ao salvar perfil:', err);
+            formErrorMsg.textContent = 'Não foi possível salvar as alterações.';
+        });
+    });
+}
+
     if (!token) {
         window.location.href = 'index.html';
     } else {
