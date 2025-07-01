@@ -1,3 +1,5 @@
+document.addEventListener('DOMContentLoaded', function() {
+
 // --- LÓGICA DO MODO ESCURO ---
 const themeToggle = document.getElementById('theme-toggle');
 
@@ -206,3 +208,5 @@ if (window.location.pathname.endsWith('dashboard.html')) {
         });
     }
 }
+
+});
