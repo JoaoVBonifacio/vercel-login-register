@@ -37,12 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- LÓGICA DO FIREBASE ---
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_AUTH_DOMAIN",
-      projectId: "SEU_PROJECT_ID",
-      storageBucket: "SEU_STORAGE_BUCKET",
-      messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-      appId: "SEU_APP_ID"
+      apiKey: "AIzaSyB3uW1r5hULsraekWThMOqPsnKeMKzqMrM",
+      authDomain: "testedelogin-3898d.firebaseapp.com",
+      databaseURL: "https://testedelogin-3898d-default-rtdb.firebaseio.com",
+      projectId: "testedelogin-3898d",
+      storageBucket: "testedelogin-3898d.firebasestorage.app",
+      messagingSenderId: "992858651157",
+      appId: "1:992858651157:web:56108bafdde87a1bbaac1c"
     };
     
     // Evita reinicializar o Firebase
