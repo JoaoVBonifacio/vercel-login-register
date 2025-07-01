@@ -182,17 +182,19 @@ if (modal) {
     });
 }
 
-// Lógica para salvar o formulário
+// public/static/app.js
+
+// Lógica para salvar o formulário (VERSÃO CORRIGIDA)
 if (editProfileForm) {
     editProfileForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        formErrorMsg.textContent = ''; // Limpa erros antigos
+        formErrorMsg.textContent = '';
 
         const newName = document.getElementById('edit-name').value;
         const newNick = document.getElementById('edit-nick').value;
         const token = sessionStorage.getItem('firebaseToken');
 
-        fetch(`${backendUrl}/profile`, {
+        fetch(`${backendUrl}/api/profile`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -200,30 +202,30 @@ if (editProfileForm) {
             },
             body: JSON.stringify({ name: newName, nick: newNick })
         })
-        .then(res => res.json())
-        // public/static/app.js
-
-// ... (encontre a lógica do Dashboard) ...
-.then(data => {
-    const profilePicElement = document.getElementById('profile-picture');
-    const userNameElement = document.getElementById('user-name');
-    const userEmailElement = document.getElementById('user-email');
-    
-    userNameElement.textContent = data.name || 'Usuário';
-    
-    // CORREÇÃO: Usa o nick vindo do backend. Se não existir, usa o email como fallback.
-    userEmailElement.textContent = data.nick ? `@${data.nick}` : `@${data.email.split('@')[0]}`;
-    
-    if (data.photo_url) {
-        profilePicElement.src = data.photo_url;
-    } else {
-        profilePicElement.src = 'data:image/svg+xml;base64,...'; // seu código SVG aqui
-    }
-})
-// ... (o resto da lógica do dashboard, como o .catch, continua aqui) ...
+        .then(res => {
+            if (!res.ok) {
+                return res.json().catch(() => {
+                    throw new Error(`Erro no servidor: ${res.statusText}`);
+                });
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (data.error) {
+                formErrorMsg.textContent = data.error;
+            } else {
+                // CORREÇÃO APLICADA AQUI:
+                // O código agora lê de 'data.updatedData' conforme a resposta da API
+                document.getElementById('user-name').textContent = data.updatedData.name;
+                document.getElementById('user-email').textContent = `@${data.updatedData.nick}`;
+                
+                alert('Perfil atualizado com sucesso!');
+                closeModal();
+            }
+        })
         .catch(err => {
             console.error('Erro ao salvar perfil:', err);
-            formErrorMsg.textContent = 'Não foi possível salvar as alterações.';
+            formErrorMsg.textContent = err.message || 'Não foi possível salvar as alterações.';
         });
     });
 }
