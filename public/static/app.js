@@ -142,73 +142,62 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Lógica do Dashboard e Rotas Protegidas
-    if (window.location.pathname.endsWith('dashboard.html')) {
-        const token = sessionStorage.getItem('firebaseToken');
-        if (!token) {
-            window.location.href = 'index.html';
-        } else {
-            // ... (o resto da lógica do dashboard continua aqui, sem alterações)
-            fetch(`${backendUrl}/profile`, {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(data => {
-            // --- LÓGICA DE PREENCHIMENTO ATUALIZADA ---
-                const profilePicElement = document.getElementById('profile-picture');
-                const userNameElement = document.getElementById('user-name');
-                const userEmailElement = document.getElementById('user-email');
-    
-             // Define o nome e o e-mail/handle
-                userNameElement.textContent = data.name || 'Usuário';
-            // Cria um "handle" a partir do email para ficar parecido com o design
-                userEmailElement.textContent = `@${data.email.split('@')[0]}`;
-    
-            // Define a foto de perfil (lógica continua a mesma)
-                if (data.photo_url) {
-                    profilePicElement.src = data.photo_url;
-                 } else {
-                    profilePicElement.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgLjg4Ljc3IDEuNTQgMS41IDEuNTNoMTNjLjg4IDAgMS41LS43NyAxLjUtMS41NHYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz48L3N2Zz4=';
-                 }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    sessionStorage.removeItem('firebaseToken');
-                    window.location.href = 'index.html';
-                    throw new Error('Token inválido ou expirado.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const profilePicElement = document.getElementById('profile-picture');
-                const userInfoDiv = document.getElementById('user-info');
-                if (data.photo_url) {
-                    profilePicElement.src = data.photo_url;
-                } else {
-                    profilePicElement.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgLjg4Ljc3IDEuNTQgMS41IDEuNTNoMTNjLjg4IDAgMS41LS43NyAxLjUtMS41NHYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz48L3N2Zz4=';
-                }
-                userInfoDiv.innerHTML = `<p><strong>Nome:</strong> ${data.name}</p><p><strong>Email:</strong> ${data.email}</p>`;
-            })
-            .catch(error => {
-                console.error('Erro ao buscar perfil:', error);
-                const userInfoDiv = document.getElementById('user-info');
-                userInfoDiv.innerText = "Não foi possível carregar os dados do perfil.";
-            });
-        }
-        // Lógica de Logout para AMBOS os botões
-        const logoutButtons = document.querySelectorAll('#logout-button, #logout-button-header');
-        logoutButtons.forEach(button => {
-            if(button) {
+    // Lógica do Dashboard e Rotas Protegidas (VERSÃO FINAL CORRIGIDA)
+if (window.location.pathname.endsWith('dashboard.html')) {
+    const token = sessionStorage.getItem('firebaseToken');
+    if (!token) {
+        window.location.href = 'index.html';
+    } else {
+        fetch(`${backendUrl}/api/profile`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(response => {
+            if (!response.ok) {
+                sessionStorage.removeItem('firebaseToken');
+                window.location.href = 'index.html';
+                throw new Error('Token inválido ou expirado.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const profilePicElement = document.getElementById('profile-picture');
+            const userNameElement = document.getElementById('user-name');
+            const userEmailElement = document.getElementById('user-email');
+            
+            // CORREÇÃO 1: Adiciona verificações para evitar erros com dados nulos
+            userNameElement.textContent = data.name || 'Usuário'; // Se data.name não existir, usa 'Usuário'
+            userEmailElement.textContent = data.email ? `@${data.email.split('@')[0]}` : '@email'; // Se data.email existir, cria o handle, senão usa '@email'
+
+            if (data.photo_url) {
+                profilePicElement.src = data.photo_url;
+            } else {
+                profilePicElement.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgLjg4Ljc3IDEuNTQgMS41IDEuNTNoMTNjLjg4IDAgMS41LS43NyAxLjUtMS41NHYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz48L3N2Zz4=';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar perfil:', error);
+            // CORREÇÃO 2: Usa um elemento que existe para mostrar a mensagem de erro
+            const userNameElement = document.getElementById('user-name');
+            if (userNameElement) {
+                userNameElement.textContent = 'Erro ao carregar perfil.';
+            }
+        });
+    }
+
+    // Lógica de Logout para AMBOS os botões
+    const logoutButtons = document.querySelectorAll('#logout-button, #logout-button-header');
+    logoutButtons.forEach(button => {
+        if(button) {
             button.addEventListener('click', () => {
                 auth.signOut().then(() => {
                     sessionStorage.removeItem('firebaseToken');
                     window.location.href = 'index.html';
                 }).catch((error) => {
                     console.error('Erro no logout:', error);
-             });
-        });
-    }
-});
-    }
-
+                });
+            });
+        }
+    });
+}
 });
