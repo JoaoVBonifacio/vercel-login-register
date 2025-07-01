@@ -156,13 +156,12 @@ if (window.location.pathname.endsWith('dashboard.html')) {
     // Função para abrir o modal
 if (openModalBtn) {
     openModalBtn.addEventListener('click', () => {
-        // Preenche o formulário com os dados atuais antes de abrir
         const currentName = document.getElementById('user-name').textContent;
-        const currentEmailHandle = document.getElementById('user-email').textContent;
+        const currentHandle = document.getElementById('user-email').textContent;
         
         document.getElementById('edit-name').value = currentName;
-        // Pega o nick do handle (remove o @)
-        document.getElementById('edit-nick').value = currentEmailHandle.substring(1);
+        // CORREÇÃO: Pega o nick do handle (remove o @)
+        document.getElementById('edit-nick').value = currentHandle.substring(1);
 
         modal.classList.remove('hidden');
     });
@@ -202,17 +201,26 @@ if (editProfileForm) {
             body: JSON.stringify({ name: newName, nick: newNick })
         })
         .then(res => res.json())
-        .then(data => {
-            if (data.error) {
-                formErrorMsg.textContent = data.error;
-            } else {
-                // Atualiza o nome na página do dashboard dinamicamente
-                document.getElementById('user-name').textContent = data.updatedData.name;
-                document.getElementById('user-email').textContent = `@${data.updatedData.nick}`;
-                alert('Perfil atualizado com sucesso!');
-                closeModal();
-            }
-        })
+        // public/static/app.js
+
+// ... (encontre a lógica do Dashboard) ...
+.then(data => {
+    const profilePicElement = document.getElementById('profile-picture');
+    const userNameElement = document.getElementById('user-name');
+    const userEmailElement = document.getElementById('user-email');
+    
+    userNameElement.textContent = data.name || 'Usuário';
+    
+    // CORREÇÃO: Usa o nick vindo do backend. Se não existir, usa o email como fallback.
+    userEmailElement.textContent = data.nick ? `@${data.nick}` : `@${data.email.split('@')[0]}`;
+    
+    if (data.photo_url) {
+        profilePicElement.src = data.photo_url;
+    } else {
+        profilePicElement.src = 'data:image/svg+xml;base64,...'; // seu código SVG aqui
+    }
+})
+// ... (o resto da lógica do dashboard, como o .catch, continua aqui) ...
         .catch(err => {
             console.error('Erro ao salvar perfil:', err);
             formErrorMsg.textContent = 'Não foi possível salvar as alterações.';
