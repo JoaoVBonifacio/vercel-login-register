@@ -153,6 +153,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             })
+            .then(data => {
+            // --- LÓGICA DE PREENCHIMENTO ATUALIZADA ---
+                const profilePicElement = document.getElementById('profile-picture');
+                const userNameElement = document.getElementById('user-name');
+                const userEmailElement = document.getElementById('user-email');
+    
+             // Define o nome e o e-mail/handle
+                userNameElement.textContent = data.name || 'Usuário';
+            // Cria um "handle" a partir do email para ficar parecido com o design
+                userEmailElement.textContent = `@${data.email.split('@')[0]}`;
+    
+            // Define a foto de perfil (lógica continua a mesma)
+                if (data.photo_url) {
+                    profilePicElement.src = data.photo_url;
+                 } else {
+                    profilePicElement.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyYzAgLjg4Ljc3IDEuNTQgMS41IDEuNTNoMTNjLjg4IDAgMS41LS43NyAxLjUtMS41NHYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz48L3N2Zz4=';
+                 }
+            })
             .then(response => {
                 if (!response.ok) {
                     sessionStorage.removeItem('firebaseToken');
@@ -177,17 +195,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 userInfoDiv.innerText = "Não foi possível carregar os dados do perfil.";
             });
         }
-        const logoutButton = document.getElementById('logout-button');
-        if(logoutButton) {
-            logoutButton.addEventListener('click', () => {
+        // Lógica de Logout para AMBOS os botões
+        const logoutButtons = document.querySelectorAll('#logout-button, #logout-button-header');
+        logoutButtons.forEach(button => {
+            if(button) {
+            button.addEventListener('click', () => {
                 auth.signOut().then(() => {
                     sessionStorage.removeItem('firebaseToken');
                     window.location.href = 'index.html';
                 }).catch((error) => {
                     console.error('Erro no logout:', error);
-                });
-            });
-        }
+             });
+        });
+    }
+});
     }
 
 });

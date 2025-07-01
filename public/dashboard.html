@@ -3,40 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    />
+    <title>Dashboard | Meu Perfil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="static/style.css">
 </head>
-<body class="dashboard-body">
+<body class="app-body">
 
-    <div class="dashboard-container">
-        <header class="dashboard-header">
-            <h1>Dashboard</h1>
-            <button id="logout-button" class="dashboard-logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </button>
-        </header>
+    <header class="main-header">
+        <nav class="main-nav">
+            <div class="nav-left">
+                <a href="#" class="logo">
+                    <i class="fas fa-rocket"></i>
+                    <span>Meu App</span>
+                </a>
+            </div>
+            <div class="nav-right">
+                <button id="logout-button-header" class="header-logout-btn">
+                    Sair
+                </button>
+            </div>
+        </nav>
+    </header>
 
-        <main class="dashboard-main">
-            <div class="profile-card">
-                <div class="profile-card-header">
-                    <img id="profile-picture" src="" alt="Foto de Perfil">
+    <main class="dashboard-content">
+        <section class="profile-banner">
+            <div class="banner-image"></div>
+            <div class="banner-content">
+                <img id="profile-picture" src="" alt="Foto de Perfil">
+                <div class="profile-details">
+                    <h2 id="user-name">Carregando...</h2>
+                    <p id="user-email">@email</p>
                 </div>
-                <div class="profile-card-body">
-                    <div id="user-info">
-                        <p>Carregando dados...</p>
-                    </div>
+                <button id="logout-button" class="profile-action-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <h3>Estatísticas</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-comment-dots"></i>
+                    <span class="stat-number">0</span>
+                    <p class="stat-label">Comentários</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-heart"></i>
+                    <span class="stat-number">0</span>
+                    <p class="stat-label">Curtidas</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-book-open"></i>
+                    <span class="stat-number">0</span>
+                    <p class="stat-label">Lidos</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-bookmark"></i>
+                    <span class="stat-number">0</span>
+                    <p class="stat-label">Vou ler</p>
                 </div>
             </div>
-        </main>
-    </div>
+        </section>
+
+    </main>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>

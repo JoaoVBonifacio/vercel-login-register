@@ -458,89 +458,221 @@ body.dark-mode .theme-toggle .fa-moon {
 
 
 /* =================================================================== */
-/* ESTILOS DO NOVO DASHBOARD                                       */
+/* ESTILOS DO NOVO DASHBOARD (ESTILO "SUSSY READS")                  */
 /* =================================================================== */
 
-.dashboard-body {
-  background-color: #111827; /* Fundo escuro principal */
-  color: #E5E7EB; /* Cor de texto clara */
-  font-family: 'Inter', sans-serif;
-  height: 100vh;
+:root {
+  /* Paleta de Cores */
+  --bg-main: #18191A;
+  --bg-card: #242526;
+  --bg-banner: #3A3B3C;
+  --border-color: #3A3B3C;
+  --text-primary: #E4E6EB;
+  --text-secondary: #B0B3B8;
+  --accent-green: #28A745;
+  --accent-green-hover: #218838;
+}
+
+.app-body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
   margin: 0;
+  padding-top: 60px; /* Espaço para o cabeçalho fixo */
 }
 
-.dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Cabeçalho Principal */
+.main-header {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  height: 60px;
 }
 
-.dashboard-header {
+.main-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #374151;
-  padding-bottom: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 100%;
 }
 
-.dashboard-header h1 {
-  font-size: 2rem;
+.logo {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 1.5rem;
   font-weight: 700;
-}
-
-.dashboard-logout-btn {
-  background-color: #374151;
-  color: #E5E7EB;
-  border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.dashboard-logout-btn:hover {
-  background-color: #4B5563;
+.header-logout-btn {
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.header-logout-btn:hover {
+    background-color: var(--accent-green);
+    color: #fff;
+    border-color: var(--accent-green);
 }
 
-.dashboard-main {
+/* Conteúdo Principal */
+.dashboard-content {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Banner de Perfil */
+.profile-banner {
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.banner-image {
+  height: 200px;
+  background-color: var(--bg-banner);
+  border-radius: 8px 8px 0 0;
+}
+
+.banner-content {
   display: flex;
-  justify-content: center;
+  align-items: flex-end;
+  padding: 0 2rem 1.5rem 2rem;
+  position: relative;
+  margin-top: -60px; /* Puxa o conteúdo para cima */
 }
 
-.profile-card {
-  background-color: #1F2937; /* Fundo do card, um pouco mais claro */
-  border-radius: 16px;
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 450px;
-  text-align: center;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border: 1px solid #374151;
-}
-
-.profile-card-header #profile-picture {
-  width: 120px;
-  height: 120px;
+#profile-picture {
+  width: 128px;
+  height: 128px;
   border-radius: 50%;
+  border: 4px solid var(--bg-card);
+  background-color: var(--bg-banner);
   object-fit: cover;
-  border: 4px solid #4F46E5; /* Borda com a cor de destaque */
+}
+
+.profile-details {
+  margin-left: 1.5rem;
+}
+
+#user-name {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+#user-email {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+}
+
+.profile-action-btn {
+  margin-left: auto; /* Empurra o botão para a direita */
+  background-color: var(--bg-banner);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.profile-action-btn:hover {
+  background-color: #4E4F50;
+}
+
+
+/* Seção de Estatísticas */
+.stats-section {
+  margin-top: 2rem;
+  background-color: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.stats-section h3 {
+  margin-top: 0;
   margin-bottom: 1.5rem;
-  background-color: #374151;
+  font-size: 1.25rem;
+  color: var(--text-primary);
 }
 
-#user-info p {
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
-  color: #D1D5DB;
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
 }
 
-#user-info p strong {
-  color: #9CA3AF; /* Cor do label (ex: "Nome:") */
-  margin-right: 0.5rem;
+.stat-card {
+  background-color: var(--bg-banner);
+  padding: 1.5rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.stat-card i {
+  font-size: 1.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.stat-card .stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-card .stat-label {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Esconde o botão duplicado no mobile */
+#logout-button-header {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .banner-content {
+        flex-direction: column;
+        align-items: center;
+        margin-top: -80px;
+        padding-bottom: 1rem;
+    }
+    .profile-details {
+        margin-left: 0;
+        text-align: center;
+        margin-top: 1rem;
+    }
+    .profile-action-btn {
+        margin-left: 0;
+        margin-top: 1rem;
+        width: 100%;
+    }
+    .header-logout-btn {
+        display: block; /* Mostra o botão no cabeçalho */
+    }
+    .profile-action-btn {
+        display: none; /* Esconde o botão no perfil */
+    }
 }
